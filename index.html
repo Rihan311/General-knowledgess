@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Knowledge Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .quiz-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .quiz-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quiz-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/6d8da27d-47a1-4197-82b5-e5f7626aa952.png') center/cover;
+            opacity: 0.1;
+        }
+        
+        .quiz-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .quiz-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .quiz-body {
+            padding: 30px;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .start-screen {
+            text-align: center;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+        }
+        
+        .question-number {
+            color: #4facfe;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .options-container {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .option:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+        
+        .option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .option-letter {
+            background: #dee2e6;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .option.selected .option-letter,
+        .option.correct .option-letter,
+        .option.incorrect .option-letter {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #4facfe;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3ba1fd;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .results-screen {
+            text-align: center;
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            position: relative;
+        }
+        
+        .score-text {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #495057;
+        }
+        
+        .feedback-message {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .quiz-header h1 {
+                font-size: 2rem;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .score-circle {
+                width: 120px;
+                height: 120px;
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>General Knowledge Challenge</h1>
+            <p>Test your knowledge with these interesting questions!</p>
+        </div>
+        
+        <div class="quiz-body">
+            <!-- Start Screen -->
+            <div class="screen start-screen active">
+                <h2 class="text-2xl font-bold mb-4">Welcome to the Quiz!</h2>
+                <p class="text-gray-600 mb-6">Challenge yourself with 10 general knowledge questions. Are you ready to test your knowledge?</p>
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/393b161d-bd37-41f5-847a-6050dbc64a8f.png" alt="Brain teaser illustration with lightbulb ideas and question marks floating around a thinking person silhouette" class="mx-auto mb-6 rounded-lg shadow-md">
+                <button class="start-btn" onclick="startQuiz()">
+                    <i class="fas fa-play mr-2"></i>Start Quiz
+                </button>
+            </div>
+            
+            <!-- Quiz Screen -->
+            <div class="screen quiz-screen">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="question-container">
+                    <div class="question-number" id="questionNumber">Question 1 of 10</div>
+                    <div class="question-text" id="questionText"></div>
+                    <div class="options-container" id="optionsContainer"></div>
+                </div>
+                <div class="navigation">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" style="display: none;">
+                        <i class="fas fa-arrow-left mr-2"></i>Previous
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                        Next <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results Screen -->
+            <div class="screen results-screen">
+                <h2 class="text-2xl font-bold mb-6">Quiz Results</h2>
+                <div class="score-circle" id="scoreCircle">
+                    <span id="scorePercentage">0%</span>
+                </div>
+                <div class="score-text" id="scoreText">You scored 0 out of 10</div>
+                <div class="feedback-message" id="feedbackMessage"></div>
+                <button class="btn btn-primary mr-3" onclick="restartQuiz()">
+                    <i class="fas fa-redo mr-2"></i>Try Again
+                </button>
+                <button class="btn btn-secondary" onclick="showAnswers()">
+                    <i class="fas fa-eye mr-2"></i>Show Answers
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz questions and answers
+        const questions = [
+            {
+                question: "What is the capital city of Australia?",
+                options: ["Sydney", "Melbourne", "Canberra", "Perth"],
+                correctAnswer: 2,
+                explanation: "Canberra was chosen as the capital of Australia in 1908 as a compromise between rivals Sydney and Melbourne."
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correctAnswer: 1,
+                explanation: "Mars appears red due to iron oxide (rust) on its surface, giving it the nickname 'The Red Planet'."
+            },
+            {
+                question: "What is the largest ocean on Earth?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correctAnswer: 3,
+                explanation: "The Pacific Ocean covers about 63 million square miles and contains more than half of the free water on Earth."
+            },
+            {
+                question: "Who painted the Mona Lisa?",
+                options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+                correctAnswer: 2,
+                explanation: "Leonardo da Vinci painted the Mona Lisa between 1503 and 1519, and it's now displayed in the Louvre Museum in Paris."
+            },
+            {
+                question: "What is the chemical symbol for gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correctAnswer: 2,
+                explanation: "The symbol 'Au' comes from the Latin word for gold, 'aurum', which means 'shining dawn'."
+            },
+            {
+                question: "Which of these is NOT a programming language?",
+                options: ["Python", "Java", "Cobra", "HTML"],
+                correctAnswer: 3,
+                explanation: "HTML (HyperText Markup Language) is a markup language used for creating web pages, not a programming language."
+            },
+            {
+                question: "What is the tallest mammal?",
+                options: ["Elephant", "Giraffe", "Hippopotamus", "Polar Bear"],
+                correctAnswer: 1,
+                explanation: "Giraffes are the tallest mammals, with adult males reaching heights of up to 18 feet (5.5 meters)."
+            },
+            {
+                question: "Which element has the atomic number 1?",
+                options: ["Oxygen", "Hydrogen", "Helium", "Carbon"],
+                correctAnswer: 1,
+                explanation: "Hydrogen has atomic number 1, meaning it has one proton in its nucleus, making it the simplest and lightest element."
+            },
+            {
+                question: "What year did the World Wide Web become publicly available?",
+                options: ["1989", "1991", "1993", "1995"],
+                correctAnswer: 2,
+                explanation: "The World Wide Web became publicly available on August 6, 1991, when Tim Berners-Lee posted about the project on the alt.hypertext newsgroup."
+            },
+            {
+                question: "Which of these countries does NOT have a monarch?",
+                options: ["United Kingdom", "Japan", "Sweden", "France"],
+                correctAnswer: 3,
+                explanation: "France is a republic and does not have a monarch. It abolished its monarchy during the French Revolution in 1792."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = Array(questions.length).fill(null);
+        let quizStarted = false;
+
+        // Initialize the quiz
+        function initQuiz() {
+            updateProgressBar();
+            showQuestion();
+        }
+
+        // Start the quiz
+        function startQuiz() {
+            quizStarted = true;
+            document.querySelector('.start-screen').classList.remove('active');
+            document.querySelector('.quiz-screen').classList.add('active');
+            initQuiz();
+        }
+
+        // Show current question
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                if (userAnswers[currentQuestion] === index) {
+                    optionElement.classList.add('selected');
+                }
+                optionElement.innerHTML = `
+                    <div class="option-letter">${letters[index]}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                optionElement.addEventListener('click', () => selectOption(index));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = currentQuestion === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? 'Finish Quiz' : 'Next';
+        }
+
+        // Select an option
+        function selectOption(optionIndex) {
+            userAnswers[currentQuestion] = optionIndex;
+            showQuestion();
+        }
+
+        // Navigate to next question
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+                updateProgressBar();
+            } else {
+                showResults();
+            }
+        }
+
+        // Navigate to previous question
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+                updateProgressBar();
+            }
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // Show results
+        function showResults() {
+            const score = calculateScore();
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            document.querySelector('.quiz-screen').classList.remove('active');
+            document.querySelector('.results-screen').classList.add('active');
+            
+            document.getElementById('scorePercentage').textContent = `${percentage}%`;
+            document.getElementById('scoreText').textContent = `You scored ${score} out of ${questions.length}`;
+            
+            let feedback = '';
+            if (percentage >= 90) {
+                feedback = '🎉 Excellent! You are a knowledge master!';
+            } else if (percentage >= 70) {
+                feedback = '👍 Great job! You have good general knowledge.';
+            } else if (percentage >= 50) {
+                feedback = '🙂 Good effort! Keep learning and improving.';
+            } else {
+                feedback = '💪 Keep practicing! Knowledge grows with every attempt.';
+            }
+            
+            document.getElementById('feedbackMessage').textContent = feedback;
+        }
+
+        // Calculate score
+        function calculateScore() {
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].correctAnswer) {
+                    score++;
+                }
+            });
+            return score;
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = Array(questions.length).fill(null);
+            document.querySelector('.results-screen').classList.remove('active');
+            document.querySelector('.quiz-screen').classList.add('active');
+            initQuiz();
+        }
+
+        // Show answers
+        function showAnswers() {
+            let answersHTML = '<div class="answers-container">';
+            answersHTML += '<h3 class="text-xl font-bold mb-4">Quiz Answers</h3>';
+            
+            questions.forEach((question, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === question.correctAnswer;
+                const letters = ['A', 'B', 'C', 'D'];
+                
+                answersHTML += `
+                    <div class="answer-item mb-6 p-4 border rounded-lg ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">
+                        <h4 class="font-semibold mb-2">Question ${index + 1}: ${question.question}</h4>
+                        <p class="mb-2 ${isCorrect ? 'text-green-600' : 'text-red-600'}">
+                            Your answer: ${userAnswer !== null ? letters[userAnswer] + '. ' + question.options[userAnswer] : 'Not answered'}
+                            ${isCorrect ? ' ✓' : ' ✗'}
+                        </p>
+                        <p class="text-green-600 font-semibold">Correct answer: ${letters[question.correctAnswer]}. ${question.options[question.correctAnswer]}</p>
+                        <p class="text-gray-600 mt-2 text-sm">${question.explanation}</p>
+                    </div>
+                `;
+            });
+            
+            answersHTML += '</div>';
+            
+            document.getElementById('feedbackMessage').innerHTML = answersHTML;
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            if (quizStarted) {
+                initQuiz();
+            }
+        };
+    </script>
+</body>
+</html>
+
